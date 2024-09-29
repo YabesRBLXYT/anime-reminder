@@ -50,6 +50,22 @@
   <button id="testNotificationButton">Tes Notifikasi</button>
 
   <script>
+    // Data anime dalam format JSON
+    const animeData = [
+      {
+        "name": "One Piece",
+        "releaseTime": "14:00"
+      },
+      {
+        "name": "Boruto",
+        "releaseTime": "10:00"
+      },
+      {
+        "name": "Jujutsu Kaisen",
+        "releaseTime": "16:00"
+      }
+    ];
+
     // Fungsi untuk menampilkan daftar anime dan waktu rilisnya di halaman
     function displayAnimeList(animeData) {
       const animeListElement = document.getElementById('animeList');
@@ -98,14 +114,11 @@
       }
     });
 
-    // Ambil data anime dari anime.json dan tampilkan
-    fetch('anime.json')
-      .then(response => response.json())
-      .then(data => {
-        displayAnimeList(data);
-        setInterval(() => checkForNewEpisodes(data), 60000); // Cek setiap 1 menit
-      })
-      .catch(error => console.error('Error loading anime data:', error));
+    // Tampilkan daftar anime saat halaman dimuat
+    displayAnimeList(animeData);
+
+    // Cek episode baru setiap 1 menit
+    setInterval(() => checkForNewEpisodes(animeData), 60000); // Cek setiap 1 menit
   </script>
 </body>
 </html>
