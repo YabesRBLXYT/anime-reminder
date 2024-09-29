@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Notification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      background-color: #fff;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Anime Episode Notification</h1>
+
+  <!-- Tempat untuk menampilkan daftar anime dan waktu rilis -->
+  <ul id="animeList"></ul>
+
+  <!-- Tombol untuk menguji notifikasi -->
+  <button id="testNotificationButton">Tes Notifikasi</button>
+
+  <script>
+    // Fungsi untuk menampilkan daftar anime dan waktu rilisnya di halaman
+    function displayAnimeList(animeData) {
+      const animeListElement = document.getElementById('animeList');
+      animeListElement.innerHTML = ''; // Kosongkan dulu
+
+      animeData.forEach(anime => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${anime.name} - Rilis pada ${anime.releaseTime}`;
+        animeListElement.appendChild(listItem);
+      });
+    }
+
+    // Fungsi untuk memeriksa dan mengirim notifikasi episode baru
+    function checkForNewEpisodes(animeData) {
+      const now = new Date();
+      const currentHours = now.getHours();
+      const currentMinutes = now.getMinutes();
+      animeData.forEach(anime => {
+        const [animeHours, animeMinutes] = anime.releaseTime.split(':').map(Number);
+
+        // Jika jam dan menit sekarang cocok dengan jam rilis anime, kirim notifikasi
+        if (currentHours === animeHours && currentMinutes === animeMinutes) {
+          notifyNewEpisode(anime.name);
+        }
+      });
+    }
+
+    // Fungsi untuk mengirim notifikasi
+    function notifyNewEpisode(animeName) {
+      if (Notification.permission === "granted") {
+        new Notification(`${animeName} episode baru telah dirilis!`);
+      }
+    }
+
+    // Minta izin notifikasi
+    if (Notification.permission !== "denied" && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    // Tombol untuk mengetes notifikasi
+    document.getElementById('testNotificationButton').addEventListener('click', () => {
+      if (Notification.permission === "granted") {
+        new Notification('Notifikasi telah terkirim!');
+      } else {
+        alert('Izin notifikasi belum diberikan!');
+      }
+    });
+
+    // Ambil data anime dari anime.json dan tampilkan
+    fetch('anime.json')
+      .then(response => response.json())
+      .then(data => {
+        displayAnimeList(data);
+        setInterval(() => checkForNewEpisodes(data), 60000); // Cek setiap 1 menit
+      })
+      .catch(error => console.error('Error loading anime data:', error));
+  </script>
+</body>
+</html>
